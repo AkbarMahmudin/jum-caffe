@@ -1,0 +1,17 @@
+{
+  "name": "jum-caffe-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "implicitDependencies": ["jum-caffe"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{e2eProjectRoot}"],
+      "options": {
+        "jestConfig": "apps/jum-caffe-e2e/jest.config.cts",
+        "passWithNoTests": true
+      },
+      "dependsOn": ["jum-caffe:build", "jum-caffe:serve"]
+    }
+  }
+}
