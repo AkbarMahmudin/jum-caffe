@@ -13,7 +13,10 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
-    "paths": {}
+    "paths": {
+      "@jum-caffe/infra": ["./libs/infra/src/index.ts"],
+      "@jum-caffe/common": ["./libs/common/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

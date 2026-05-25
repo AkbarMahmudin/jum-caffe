@@ -1,0 +1,85 @@
+services:
+  # Database
+  mongodb-auth:
+    image: docker.io/bitnami/mongodb:latest
+    environment:
+      - MONGODB_ADVERTISED_HOSTNAME=localhost
+      - MONGODB_ROOT_PASSWORD=password123
+    volumes:
+      - 'mongodb_auth_data:/bitnami/mongodb'
+    ports:
+      - '27017:27017'
+  postgres-product:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=product_db
+    ports:
+      - 5434:5432
+    volumes:
+      - postgres_product_data:/var/lib/postgresql/data
+    networks:
+      - postgres_product_network
+  postgres-outlet:
+    image: postgis/postgis:16-3.4
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=outlet_db
+    ports:
+      - 5435:5432
+    volumes:
+      - postgres_outlet_data:/var/lib/postgresql/data
+    networks:
+      - postgres_outlet_network
+  postgres-order:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=order_db
+    ports:
+      - 5436:5432
+    volumes:
+      - postgres_order_data:/var/lib/postgresql/data
+    networks:
+      - postgres_order_network
+
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - '5672:5672' # AMQP
+      - '15672:15672' # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    restart: unless-stopped
+
+  # Redis
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redis:/data
+
+volumes:
+  mongodb_auth_data:
+    driver: local
+  redis:
+    driver: local
+  postgres_product_data:
+  postgres_outlet_data:
+  postgres_order_data:
+  rabbitmq_data:
+networks:
+  postgres_product_network:
+    driver: bridge
+  postgres_outlet_network:
+    driver: bridge
+  postgres_order_network:
+    driver: bridge

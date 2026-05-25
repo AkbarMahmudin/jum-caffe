@@ -38,7 +38,12 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/jum-caffe-e2e/**/*"]
+      "exclude": [
+        "apps/auth-service-e2e/**/*",
+        "apps/outlet-service-e2e/**/*",
+        "apps/product-service-e2e/**/*",
+        "apps/order-service-e2e/**/*"
+      ]
     }
   ]
 }
