@@ -10,6 +10,8 @@ import { CalculatedOrderItem } from './interface/calculated-order-item.interface
 import { OrderRepository } from './repositories/order.repository';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { OrderStatus } from './enum/order-status.enum';
+import { PaymentClient } from './client/payment.client';
+import { CreatePaymentResponse } from './interface/create-payment-response.interface';
 
 @Injectable()
 export class OrderService {
@@ -19,17 +21,34 @@ export class OrderService {
     private readonly productRepo: ProductSnapshotRepository,
     private readonly productOptionRepo: ProductOptionSnapshotRepository,
     private readonly orderRepository: OrderRepository,
+    private readonly paymentClient: PaymentClient,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
     // TODO: implement idempotency key
     const payload = await this.buildOrderPayload(createOrderDto);
 
-    return this.orderRepository.create({
+    const order = await this.orderRepository.create({
       ...payload,
       status: OrderStatus.WAITING_PAYMENT,
       histories: [{ status: OrderStatus.PENDING }],
     });
+
+    let payment: CreatePaymentResponse | null = null;
+
+    try {
+      payment = await this.paymentClient.createPayment({
+        orderId: order.id,
+        amount: order.totalPrice,
+      });
+    } catch (error) {
+      this.logger.warn(`Failed create payment for order ${order.id}`);
+    }
+
+    return {
+      ...order,
+      payment,
+    };
   }
 
   findAll(query: QueryParamsDto) {
@@ -180,8 +199,6 @@ export class OrderService {
         customizations: mappedCustomizations,
       });
     }
-
-    console.log({ calculatedItems });
 
     return {
       items: calculatedItems,

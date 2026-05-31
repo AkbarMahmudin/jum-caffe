@@ -9,6 +9,9 @@ import { OrderItem } from './entities/order-item.entity';
 import { OrderItemCustomization } from './entities/order-item-customization.entity';
 import { OrderRepository } from './repositories/order.repository';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
+import { HttpModule } from '@nestjs/axios';
+import { PaymentClient } from './client/payment.client';
+import { RmqModule } from '@jum-caffe/common';
 
 @Module({
   imports: [
@@ -20,8 +23,10 @@ import { OrderStatusHistory } from './entities/order-status-history.entity';
       OrderItemCustomization,
       OrderStatusHistory,
     ]),
+    HttpModule,
+    RmqModule,
   ],
   controllers: [OrderController],
-  providers: [OrderService, OrderRepository],
+  providers: [OrderService, OrderRepository, PaymentClient],
 })
 export class OrderModule {}

@@ -7,14 +7,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { ConfigService } from '@nestjs/config';
-import {
-  OUTLET_SERVICE,
-  PAYMENT_SERVICE,
-  PRODUCT_SERVICE,
-  ResponseInterceptor,
-  RmqService,
-  TypeOrmExceptionFilter,
-} from '@jum-caffe/common';
+import { ResponseInterceptor, TypeOrmExceptionFilter } from '@jum-caffe/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
@@ -23,7 +16,7 @@ async function bootstrap() {
   });
   const config = app.get(ConfigService);
 
-  const globalPrefix = 'api/orders';
+  const globalPrefix = 'api/payments';
   app.setGlobalPrefix(globalPrefix);
 
   app.useGlobalInterceptors(new ResponseInterceptor());
@@ -32,8 +25,8 @@ async function bootstrap() {
   app.enableCors();
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Order Service')
-    .setDescription('Service for manage order')
+    .setTitle('Payment Service')
+    .setDescription('Service for manage payment')
     .setVersion('1.0')
     .build();
   const documentFactory = () =>
@@ -43,12 +36,7 @@ async function bootstrap() {
   const port = config.get('PORT') || 3001;
   await app.listen(port);
 
-  // RabbitMQ
-  const rmqService = app.get<RmqService>(RmqService);
-
   // Connect microservices
-  app.connectMicroservice(rmqService.getOptions(PRODUCT_SERVICE));
-  app.connectMicroservice(rmqService.getOptions(PAYMENT_SERVICE));
   await app.startAllMicroservices();
 
   Logger.log(
