@@ -73,8 +73,8 @@ export class OrderController {
         payment.orderId,
         payment.status as OrderStatus,
       );
-
-      this.rmqService.ack(ctx);
     }
+
+    this.rmqService.ack(ctx);
   }
 }

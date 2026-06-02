@@ -3,7 +3,7 @@ import { IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
 
 export class CreatePaymentDto {
   @IsNotEmpty()
-  // @IsUUID()
+  @IsUUID()
   @ApiProperty()
   orderId!: string;
 

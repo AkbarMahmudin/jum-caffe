@@ -1,6 +1,7 @@
 export interface PaymentProviderResponse {
   id?: string;
   token?: string;
+  orderId?: string;
   redirectUrl: string;
 }
 

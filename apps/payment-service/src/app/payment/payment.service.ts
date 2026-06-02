@@ -53,6 +53,7 @@ export class PaymentService {
       });
 
       snapCreated.id = payment.id;
+      snapCreated.orderId = payment.providerOrderId ?? payment.orderId;
     }
 
     return snapCreated;
