@@ -6,29 +6,38 @@ import {
   Param,
   ParseUUIDPipe,
   Query,
-  Put,
+  Logger,
 } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
-import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
-import { ApiConsumes } from '@nestjs/swagger';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { PaymentEvent } from './event/payment.event';
+import { OrderStatus } from './enum/order-status.enum';
+import { RmqService } from '@jum-caffe/common';
 
 @Controller()
 export class OrderController {
-  constructor(private readonly orderService: OrderService) {}
+  private readonly logger = new Logger(OrderController.name);
+
+  constructor(
+    private readonly orderService: OrderService,
+    private readonly rmqService: RmqService,
+  ) {}
 
   @Post()
   async create(
     @Body()
     createOrderDto: CreateOrderDto,
   ) {
-    const order = await this.orderService.create(createOrderDto);
+    const { payment, ...order } =
+      await this.orderService.create(createOrderDto);
 
     return {
       message: 'Order created successfully',
       data: {
         id: order.id,
+        payment,
       },
     };
   }
@@ -52,12 +61,20 @@ export class OrderController {
   //   return this.orderService.update(id, updateOrderDto);
   // }
 
-  @Put(':id/status')
-  @ApiConsumes('application/x-www-form-urlencoded', 'application/json')
-  updateStatus(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() { status }: UpdateOrderStatusDto,
+  @EventPattern('payment.updated')
+  async updateStatus(
+    @Payload() { payload: payment }: PaymentEvent,
+    @Ctx() ctx: RmqContext,
   ) {
-    return this.orderService.updateStatus(id, status);
+    this.logger.log(`Received event: payment.updated (${payment.orderId})`);
+
+    if (payment.status !== OrderStatus.PENDING) {
+      await this.orderService.updateStatus(
+        payment.orderId,
+        payment.status as OrderStatus,
+      );
+    }
+
+    this.rmqService.ack(ctx);
   }
 }

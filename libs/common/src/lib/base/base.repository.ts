@@ -45,6 +45,7 @@ export class BaseRepository<T extends ObjectLiteral> {
   async findOne(id: string, manager?: EntityManager): Promise<T> {
     const options: FindOneOptions<T> = {
       where: { id: id as unknown as T[keyof T] },
+      relations: ['logs'],
     };
 
     return this.getRepo(manager).findOneOrFail(options);
