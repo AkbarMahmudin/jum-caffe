@@ -1,6 +1,6 @@
 import { BaseEntity } from '@jum-caffe/common';
 import { Column, Entity, ManyToOne } from 'typeorm';
-import { OrderStatus } from '../enum/order-status.enum';
+import { OrderStatus } from '../../common/enum/order-status.enum';
 import { Order } from './order.entity';
 
 @Entity('order_status_histories')

@@ -28,7 +28,11 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = { email: user.email, sub: user._id };
+    const payload = {
+      sub: user._id,
+      name: user.name,
+      email: user.email,
+    };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = randomBytes(32).toString('hex');
 
@@ -71,5 +75,12 @@ export class AuthService {
     return this.refreshTokenRepository.findOneAndDelete({
       refreshToken,
     });
+  }
+
+  profile(userId: string) {
+    return this.userRepository.findOne(
+      { _id: userId },
+      { lean: true, projection: '-password' },
+    );
   }
 }

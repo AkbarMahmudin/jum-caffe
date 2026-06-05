@@ -35,6 +35,7 @@ async function bootstrap() {
     .setTitle('Order Service')
     .setDescription('Service for manage order')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

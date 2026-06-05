@@ -1,7 +1,15 @@
 import { BaseEntity } from '@jum-caffe/common';
 import { Category } from '../../category/entities/category.entity';
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+} from 'typeorm';
 import { Option } from '../../option/entities/option.entity';
+import { OutletProduct } from '../../outlet-product/entities/outlet-product.entity';
 
 @Entity('products')
 export class Product extends BaseEntity {
@@ -29,4 +37,7 @@ export class Product extends BaseEntity {
   @ManyToMany(() => Option)
   @JoinTable()
   options!: Option[];
+
+  @OneToMany(() => OutletProduct, (outletProduct) => outletProduct.product)
+  outletProducts?: OutletProduct[];
 }

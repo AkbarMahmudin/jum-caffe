@@ -69,6 +69,9 @@ export class PaymentService {
       },
       take: limit,
       skip: (page - 1) * limit,
+      order: {
+        createdAt: 'DESC',
+      },
     });
   }
 

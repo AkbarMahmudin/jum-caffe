@@ -10,7 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderItem } from '../entities/order-item.entity';
 import { OrderItemCustomization } from '../entities/order-item-customization.entity';
-import { OrderStatus } from '../enum/order-status.enum';
+import { OrderStatus } from '../../common/enum/order-status.enum';
 import { OrderStatusHistory } from '../entities/order-status-history.entity';
 
 @Injectable()

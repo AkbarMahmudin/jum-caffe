@@ -28,6 +28,7 @@ async function bootstrap() {
     .setTitle('Payment Service')
     .setDescription('Service for manage payment')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

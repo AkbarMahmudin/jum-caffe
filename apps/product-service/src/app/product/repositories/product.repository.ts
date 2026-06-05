@@ -117,17 +117,11 @@ export class ProductRepository extends BaseRepository<Product> {
     const queryBuilder = this.getRepo(manager)
       .createQueryBuilder('products')
       .leftJoinAndSelect('products.category', 'category')
-      .innerJoin(
-        'outlet_products',
+      .innerJoinAndSelect(
+        'products.outletProducts',
         'op',
-        `
-          op.productId = products.id
-          AND op.outletId = :outletId
-          AND op.deletedAt IS NULL
-        `,
-        {
-          outletId,
-        },
+        'op.outletId = :outletId',
+        { outletId },
       )
       .select([
         'products.id',
@@ -138,6 +132,7 @@ export class ProductRepository extends BaseRepository<Product> {
         'category.name',
         'products.createdAt',
         'products.updatedAt',
+        'op.isAvailable',
       ]);
 
     if (options?.where) {
@@ -170,6 +165,11 @@ export class ProductRepository extends BaseRepository<Product> {
       queryBuilder.take(options.take);
     }
 
-    return await queryBuilder.getMany();
+    const products = await queryBuilder.getMany();
+
+    return products?.map(({ outletProducts, ...product }) => ({
+      ...product,
+      isAvailable: outletProducts?.[0]?.isAvailable ?? false,
+    }));
   }
 }

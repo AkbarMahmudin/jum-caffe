@@ -26,6 +26,7 @@ async function bootstrap() {
     .setTitle('Outlet Service')
     .setDescription('Service for mange outlet')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

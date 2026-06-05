@@ -2,16 +2,19 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthLoginDto } from './dto/auth-login.dto';
-import { ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { CreateNewAccessTokenDto } from './dto/create-new-access-token.dto';
 import { AuthLogoutDto } from './dto/auth-logout.dto';
+import { AuthUser, CurrentUser, JwtAuthGuard } from '@jum-caffe/common';
 
 @ApiTags({
   name: 'Auth',
@@ -37,5 +40,12 @@ export class AuthController {
   @Put('refresh')
   async refresh(@Body() { refreshToken }: AuthLogoutDto) {
     return this.authService.getNewAccessToken(refreshToken);
+  }
+
+  @ApiBearerAuth('JWT-auth')
+  @UseGuards(JwtAuthGuard)
+  @Get('profile')
+  getProfile(@CurrentUser() user: AuthUser) {
+    return this.authService.profile(user.sub);
   }
 }

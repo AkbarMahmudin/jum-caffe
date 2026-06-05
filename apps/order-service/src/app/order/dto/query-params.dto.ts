@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsIn, IsNumber, IsOptional } from 'class-validator';
-import { OrderStatus } from '../enum/order-status.enum';
+import { OrderStatus } from '../../common/enum/order-status.enum';
 
 export class QueryParamsDto {
   @IsOptional()

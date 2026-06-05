@@ -13,10 +13,12 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { PaymentEvent } from './event/payment.event';
-import { OrderStatus } from './enum/order-status.enum';
+import { OrderStatus } from '../common/enum/order-status.enum';
 import { RmqService } from '@jum-caffe/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller()
+@ApiBearerAuth()
 export class OrderController {
   private readonly logger = new Logger(OrderController.name);
 

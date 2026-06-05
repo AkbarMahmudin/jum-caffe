@@ -26,6 +26,14 @@ async function bootstrap() {
     .setDescription('Service for authentication & authorization')
     .setVersion('1.0')
     // .addTag('cats')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+      },
+      'JWT-auth', // Identifier for this security scheme
+    )
     .build();
   const documentFactory = () =>
     SwaggerModule.createDocument(app, swaggerConfig);

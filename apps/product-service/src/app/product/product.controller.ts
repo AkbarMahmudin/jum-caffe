@@ -14,8 +14,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { AddProductOptions } from './dto/add-product-options.dto';
+import { Public } from '@jum-caffe/common';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller()
+@ApiBearerAuth()
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
@@ -30,11 +33,15 @@ export class ProductController {
   }
 
   @Get()
+  @Public()
+  @ApiOperation({ security: [] })
   findAll(@Query() query: QueryParamsDto) {
     return this.productService.findAll(query);
   }
 
   @Get(':id')
+  @Public()
+  @ApiOperation({ security: [] })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.productService.findOne(id);
   }

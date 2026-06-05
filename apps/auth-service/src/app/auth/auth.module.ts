@@ -3,10 +3,9 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { UserModule } from '../user/user.module';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { RedisModule } from '@jum-caffe/common';
+import { JwtStrategy, RedisModule } from '@jum-caffe/common';
 import { RefreshTokenRepository } from './repositories/refresh-token.repository';
 import { MongooseModule } from '@nestjs/mongoose';
 import { RefreshToken } from './entities/refresh-token.entity';
@@ -32,6 +31,6 @@ import { RefreshTokenSchema } from './entities/refresh-token.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, RefreshTokenRepository],
+  providers: [AuthService, JwtStrategy, RefreshTokenRepository],
 })
 export class AuthModule {}

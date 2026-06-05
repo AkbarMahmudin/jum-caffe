@@ -6,12 +6,12 @@ import { ProductOptionSnapshotRepository } from '../product-option-snapshot/repo
 import { In } from 'typeorm';
 import { ProductSnapshot } from '../product-snapshot/entities/product-snapshot.entity';
 import { ProductOptionSnapshot } from '../product-option-snapshot/entities/product-option-snapshot.entity';
-import { CalculatedOrderItem } from './interface/calculated-order-item.interface';
+import { CalculatedOrderItem } from '../common/interface/calculated-order-item.interface';
 import { OrderRepository } from './repositories/order.repository';
 import { QueryParamsDto } from './dto/query-params.dto';
-import { OrderStatus } from './enum/order-status.enum';
-import { PaymentClient } from './client/payment.client';
-import { CreatePaymentResponse } from './interface/create-payment-response.interface';
+import { OrderStatus } from '../common/enum/order-status.enum';
+import { PaymentClient } from '../common/client/payment.client';
+import { CreatePaymentResponse } from '../common/interface/create-payment-response.interface';
 
 @Injectable()
 export class OrderService {
@@ -31,7 +31,7 @@ export class OrderService {
     const order = await this.orderRepository.create({
       ...payload,
       status: OrderStatus.WAITING_PAYMENT,
-      histories: [{ status: OrderStatus.PENDING }],
+      histories: [{ status: OrderStatus.WAITING_PAYMENT }],
     });
 
     let payment: CreatePaymentResponse | null = null;
