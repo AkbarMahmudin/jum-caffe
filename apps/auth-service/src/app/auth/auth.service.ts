@@ -1,4 +1,8 @@
-import { Injectable, UnprocessableEntityException } from '@nestjs/common';
+import {
+  Injectable,
+  UnprocessableEntityException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserRepository } from '../user/repositories/user.repository';
 import { comparePassword } from '@jum-caffe/common';
 import { JwtService } from '@nestjs/jwt';
@@ -18,13 +22,11 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(email);
     const isMatch = user && comparePassword(password, user.password);
 
-    if (user && isMatch) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
-      return result;
+    if (!user || !isMatch) {
+      throw new UnauthorizedException('Invalid email or password');
     }
 
-    return null;
+    return user;
   }
 
   async login(user: User) {

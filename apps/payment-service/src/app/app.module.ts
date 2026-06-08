@@ -4,6 +4,7 @@ import {
   DatabaseModule,
   JwtAuthGuard,
   JwtStrategy,
+  LocalStorageModule,
   RedisModule,
   RmqModule,
 } from '@jum-caffe/common';
@@ -18,6 +19,7 @@ import { PaymentModule } from './payment/payment.module';
     RedisModule,
     DatabaseModule,
     RmqModule,
+    LocalStorageModule,
     PaymentModule,
   ],
   providers: [

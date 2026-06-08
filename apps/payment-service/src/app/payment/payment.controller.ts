@@ -46,9 +46,9 @@ export class PaymentController {
     });
   }
 
-  @Post('order/:id/retry')
-  reCreate(@Param('id') orderId: string) {
+  @Post('retry')
+  reCreate(@Body() createPaymentDto: CreatePaymentDto) {
     // TODO: Send event to order-service if retry payment
-    return this.paymentService.reCreate(orderId);
+    return this.paymentService.reCreate(createPaymentDto);
   }
 }

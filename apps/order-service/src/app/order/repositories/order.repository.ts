@@ -38,6 +38,25 @@ export class OrderRepository extends BaseRepository<Order> {
     return order;
   }
 
+  async findOneWithUser(
+    id: string,
+    userId: string,
+    manager?: EntityManager,
+  ): Promise<Order> {
+    const repo = this.getRepo(manager);
+    const order = await repo.findOneOrFail({
+      where: { id, userId },
+      relations: {
+        items: {
+          customizations: true,
+        },
+        histories: true,
+      },
+    });
+
+    return order;
+  }
+
   async update(
     id: string,
     data: QueryDeepPartialEntity<Order>,

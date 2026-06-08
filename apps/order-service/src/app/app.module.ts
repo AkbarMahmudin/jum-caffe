@@ -7,6 +7,7 @@ import {
   DatabaseModule,
   JwtAuthGuard,
   JwtStrategy,
+  LocalStorageModule,
   RmqModule,
 } from '@jum-caffe/common';
 
@@ -18,6 +19,7 @@ import {
     }),
     DatabaseModule,
     RmqModule,
+    LocalStorageModule,
     ProductSnapshotModule,
     ProductOptionSnapshotModule,
     OrderModule,

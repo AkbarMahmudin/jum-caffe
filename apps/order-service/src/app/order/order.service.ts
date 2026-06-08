@@ -12,6 +12,8 @@ import { QueryParamsDto } from './dto/query-params.dto';
 import { OrderStatus } from '../common/enum/order-status.enum';
 import { PaymentClient } from '../common/client/payment.client';
 import { CreatePaymentResponse } from '../common/interface/create-payment-response.interface';
+import { ClsService } from 'nestjs-cls';
+import { ILocalStorage } from '@jum-caffe/common';
 
 @Injectable()
 export class OrderService {
@@ -22,6 +24,7 @@ export class OrderService {
     private readonly productOptionRepo: ProductOptionSnapshotRepository,
     private readonly orderRepository: OrderRepository,
     private readonly paymentClient: PaymentClient,
+    private readonly cls: ClsService<ILocalStorage>,
   ) {}
 
   async create(createOrderDto: CreateOrderDto) {
@@ -31,7 +34,7 @@ export class OrderService {
     const order = await this.orderRepository.create({
       ...payload,
       status: OrderStatus.WAITING_PAYMENT,
-      histories: [{ status: OrderStatus.WAITING_PAYMENT }],
+      userId: this.cls.get('user.sub'),
     });
 
     let payment: CreatePaymentResponse | null = null;
@@ -52,13 +55,12 @@ export class OrderService {
   }
 
   findAll(query: QueryParamsDto) {
-    // TODO: get all by user id
-
     const { status, limit, sortBy, sort } = query;
 
     return this.orderRepository.findAll({
       where: {
         status,
+        userId: this.cls.get('user.sub'),
       },
       take: limit,
       order: {
@@ -68,7 +70,7 @@ export class OrderService {
   }
 
   findOne(id: string) {
-    return this.orderRepository.findOne(id);
+    return this.orderRepository.findOneWithUser(id, this.cls.get('user.sub'));
   }
 
   // ! DRAFT

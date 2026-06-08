@@ -70,12 +70,12 @@ export class OrderController {
   ) {
     this.logger.log(`Received event: payment.updated (${payment.orderId})`);
 
-    if (payment.status !== OrderStatus.PENDING) {
-      await this.orderService.updateStatus(
-        payment.orderId,
-        payment.status as OrderStatus,
-      );
-    }
+    const orderStatus =
+      payment.status !== OrderStatus.PENDING
+        ? (payment.status as OrderStatus)
+        : OrderStatus.WAITING_PAYMENT;
+
+    await this.orderService.updateStatus(payment.orderId, orderStatus);
 
     this.rmqService.ack(ctx);
   }

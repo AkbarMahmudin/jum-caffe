@@ -30,6 +30,19 @@ export class PaymentRepository extends BaseRepository<Payment> {
     return this.getRepo(manager).findOneOrFail(options);
   }
 
+  async findOneWithUser(
+    id: string,
+    userId: string,
+    manager?: EntityManager,
+  ): Promise<Payment> {
+    const options: FindOneOptions<Payment> = {
+      where: { id, userId },
+      relations: ['logs'],
+    };
+
+    return this.getRepo(manager).findOneOrFail(options);
+  }
+
   async update(
     id: string,
     data: QueryDeepPartialEntity<Payment>,

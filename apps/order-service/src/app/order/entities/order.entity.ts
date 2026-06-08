@@ -10,8 +10,8 @@ export class Order extends BaseEntity {
   @Column('uuid')
   outletId!: string;
 
-  // @Column('uuid')
-  // userId!: string;
+  @Column()
+  userId!: string;
 
   @Column({ default: 0 })
   totalPrice!: number;

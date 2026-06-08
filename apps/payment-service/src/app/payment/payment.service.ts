@@ -7,18 +7,17 @@ import {
 } from '@nestjs/common';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 import { PaymentRepository } from './repositories/payment.repository';
-import { ConfigService } from '@nestjs/config';
 import { PaymentStatus } from '../common/enum/payment-status.enum';
 import { Payment } from './entities/payment.entity';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { PaymentProviderInterface } from '../common/interface/payment-provider.interface';
 import { MidtransTransactionResponse } from '../common/provider/midtrans/midtrans.interface';
-import { In } from 'typeorm';
 import { PaymentLog } from './entities/payment-log.entity';
-import { PAYMENT_SERVICE } from '@jum-caffe/common';
+import { ILocalStorage, PAYMENT_SERVICE } from '@jum-caffe/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { PaymentEvent } from './event/payment.event';
 import { lastValueFrom } from 'rxjs';
+import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class PaymentService {
@@ -29,6 +28,7 @@ export class PaymentService {
     private readonly paymentProvider: PaymentProviderInterface,
     private readonly paymentRepository: PaymentRepository,
     @Inject(PAYMENT_SERVICE) private readonly client: ClientProxy,
+    private readonly cls: ClsService<ILocalStorage>,
   ) {}
 
   async create(createPaymentDto: CreatePaymentDto) {
@@ -50,6 +50,7 @@ export class PaymentService {
         snapToken: snapCreated.token,
         redirectUrl: snapCreated.redirectUrl,
         providerOrderId,
+        userId: this.cls.get('user.sub'),
       });
 
       snapCreated.id = payment.id;
@@ -66,6 +67,7 @@ export class PaymentService {
       where: {
         status,
         orderId,
+        userId: this.cls.get('user.sub'),
       },
       take: limit,
       skip: (page - 1) * limit,
@@ -76,19 +78,15 @@ export class PaymentService {
   }
 
   findOne(id: string) {
-    return this.paymentRepository.findOne(id);
+    return this.paymentRepository.findOneWithUser(id, this.cls.get('user.sub'));
   }
 
-  async reCreate(orderId: string) {
+  async reCreate(createPaymentDto: Omit<CreatePaymentDto, 'attempt'>) {
     // Check available payment is'nt pending or paid
     const paymentExists = await this.paymentRepository.findAll({
       where: {
-        orderId,
-        status: In([
-          PaymentStatus.CANCELLED,
-          PaymentStatus.EXPIRED,
-          PaymentStatus.FAILED,
-        ]),
+        orderId: createPaymentDto.orderId,
+        userId: this.cls.get('user.sub'),
       },
       select: ['id', 'orderId', 'status', 'amount', 'attempt'],
       order: { attempt: 'DESC' },
@@ -96,19 +94,40 @@ export class PaymentService {
     });
 
     if (!paymentExists.length) {
+      return this.create(createPaymentDto);
+    }
+
+    const payment = paymentExists[0];
+
+    const invalidPaymentStatus = [
+      PaymentStatus.PAID,
+      PaymentStatus.PENDING,
+    ].includes(payment.status as PaymentStatus);
+    if (invalidPaymentStatus) {
       throw new UnprocessableEntityException(
         'No available payment to retry. Only payment with status cancelled, expired, or failed can be retried.',
       );
     }
 
-    const payment = paymentExists[0];
-
     // Re create payment
-    return this.create({
+    const paymentRecreated = await this.create({
       orderId: payment.orderId,
       amount: payment.amount,
       attempt: payment.attempt + 1,
     });
+
+    // Emit event to rmq
+    const eventType = 'payment.updated';
+    const event = new PaymentEvent(eventType, {
+      id: paymentRecreated.id,
+      orderId: createPaymentDto.orderId,
+      status: PaymentStatus.PENDING,
+    });
+    await lastValueFrom(this.client.emit(eventType, event));
+
+    this.logger.debug('Emitted event', event);
+
+    return paymentRecreated;
   }
 
   async handleWebhook(payload: MidtransTransactionResponse) {
