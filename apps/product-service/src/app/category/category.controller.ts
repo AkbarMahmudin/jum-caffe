@@ -11,8 +11,11 @@ import {
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Public } from '@jum-caffe/common';
 
 @Controller('categories')
+@ApiBearerAuth()
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
@@ -27,11 +30,15 @@ export class CategoryController {
   }
 
   @Get()
+  @Public()
+  @ApiOperation({ security: [] })
   async findAll() {
     return this.categoryService.findAll();
   }
 
   @Get(':id')
+  @Public()
+  @ApiOperation({ security: [] })
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoryService.findOne(id);
   }

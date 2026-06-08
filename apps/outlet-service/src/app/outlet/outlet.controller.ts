@@ -13,8 +13,11 @@ import { OutletService } from './outlet.service';
 import { CreateOutletDto } from './dto/create-outlet.dto';
 import { UpdateOutletDto } from './dto/update-outlet.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import { Public } from '@jum-caffe/common';
 
 @Controller('')
+@ApiBearerAuth()
 export class OutletController {
   constructor(private readonly outletService: OutletService) {}
 
@@ -31,11 +34,15 @@ export class OutletController {
   }
 
   @Get()
+  @Public()
+  @ApiOperation({ security: [] })
   findAll(@Query() query: QueryParamsDto) {
     return this.outletService.findAll(query);
   }
 
   @Get(':id')
+  @Public()
+  @ApiOperation({ security: [] })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.outletService.findOne(id);
   }

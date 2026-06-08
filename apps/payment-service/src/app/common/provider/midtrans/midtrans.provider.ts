@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import * as midtransClient from 'midtrans-client';
 import { PaymentProviderInterface } from '../../interface/payment-provider.interface';
 import { createHash } from 'crypto';
+import { MidtransTransactionParameters } from './midtrans.interface';
 
 @Injectable()
 export class MidtransProvider implements PaymentProviderInterface {
@@ -15,13 +16,17 @@ export class MidtransProvider implements PaymentProviderInterface {
 
   constructor(private readonly config: ConfigService) {}
 
-  async createTransaction(orderId: string, amount: number) {
-    const parameter: midtransClient.SnapTransactionParameters = {
+  async createTransaction(
+    orderId: string,
+    amount: number,
+    details?: Omit<MidtransTransactionParameters, 'transaction_details'>,
+  ) {
+    const parameter: MidtransTransactionParameters = {
       transaction_details: {
         order_id: orderId,
         gross_amount: amount,
       },
-      // Optional: Add customer_details, item_details, etc.
+      ...details,
     };
 
     const { token, redirect_url: redirectUrl } =

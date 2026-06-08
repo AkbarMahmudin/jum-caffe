@@ -10,7 +10,7 @@ import { OrderItemCustomization } from './entities/order-item-customization.enti
 import { OrderRepository } from './repositories/order.repository';
 import { OrderStatusHistory } from './entities/order-status-history.entity';
 import { HttpModule } from '@nestjs/axios';
-import { PaymentClient } from './client/payment.client';
+import { PaymentClient } from '../common/client/payment.client';
 import { RmqModule } from '@jum-caffe/common';
 
 @Module({

@@ -8,7 +8,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { OrderItemDto } from './order-item.dto';
-import { OrderSource } from '../enum/order-source.enum';
+import { OrderSource } from '../../common/enum/order-source.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateOrderDto {

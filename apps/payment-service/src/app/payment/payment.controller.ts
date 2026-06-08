@@ -1,19 +1,24 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { CreatePaymentDto } from './dto/create-payment.dto';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import { QueryParamsDto } from './dto/query-params.dto';
+import { Public } from '@jum-caffe/common';
 
 @Controller()
+@ApiBearerAuth()
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
+  // TODO: Add authorization for internal services (order-service) to call this endpoint
   @Post()
+  @Public()
   create(@Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.create(createPaymentDto);
   }
 
   @Post('webhook')
+  @Public()
   @ApiBody({ description: 'Midtrans webhook payload', type: Object })
   async webhook(@Body() payload: any) {
     return this.paymentService.handleWebhook(payload);
@@ -41,8 +46,9 @@ export class PaymentController {
     });
   }
 
-  @Post('order/:id/retry')
-  reCreate(@Param('id') orderId: string) {
-    return this.paymentService.reCreate(orderId);
+  @Post('retry')
+  reCreate(@Body() createPaymentDto: CreatePaymentDto) {
+    // TODO: Send event to order-service if retry payment
+    return this.paymentService.reCreate(createPaymentDto);
   }
 }

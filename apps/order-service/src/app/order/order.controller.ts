@@ -13,10 +13,12 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
 import { PaymentEvent } from './event/payment.event';
-import { OrderStatus } from './enum/order-status.enum';
+import { OrderStatus } from '../common/enum/order-status.enum';
 import { RmqService } from '@jum-caffe/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller()
+@ApiBearerAuth()
 export class OrderController {
   private readonly logger = new Logger(OrderController.name);
 
@@ -68,12 +70,12 @@ export class OrderController {
   ) {
     this.logger.log(`Received event: payment.updated (${payment.orderId})`);
 
-    if (payment.status !== OrderStatus.PENDING) {
-      await this.orderService.updateStatus(
-        payment.orderId,
-        payment.status as OrderStatus,
-      );
-    }
+    const orderStatus =
+      payment.status !== OrderStatus.PENDING
+        ? (payment.status as OrderStatus)
+        : OrderStatus.WAITING_PAYMENT;
+
+    await this.orderService.updateStatus(payment.orderId, orderStatus);
 
     this.rmqService.ack(ctx);
   }

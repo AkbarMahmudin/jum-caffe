@@ -1,6 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule, RedisModule, RmqModule } from '@jum-caffe/common';
+import {
+  DatabaseModule,
+  JwtAuthGuard,
+  JwtStrategy,
+  LocalStorageModule,
+  RedisModule,
+  RmqModule,
+} from '@jum-caffe/common';
 import { PaymentModule } from './payment/payment.module';
 
 @Module({
@@ -12,9 +19,15 @@ import { PaymentModule } from './payment/payment.module';
     RedisModule,
     DatabaseModule,
     RmqModule,
+    LocalStorageModule,
     PaymentModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [
+    JwtStrategy,
+    {
+      provide: 'APP_GUARD',
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}

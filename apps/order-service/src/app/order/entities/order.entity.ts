@@ -1,5 +1,5 @@
-import { OrderStatus } from '../enum/order-status.enum';
-import { OrderSource } from '../enum/order-source.enum';
+import { OrderStatus } from '../../common/enum/order-status.enum';
+import { OrderSource } from '../../common/enum/order-source.enum';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { OrderItem } from './order-item.entity';
 import { BaseEntity } from '@jum-caffe/common';
@@ -10,8 +10,8 @@ export class Order extends BaseEntity {
   @Column('uuid')
   outletId!: string;
 
-  // @Column('uuid')
-  // userId!: string;
+  @Column()
+  userId!: string;
 
   @Column({ default: 0 })
   totalPrice!: number;

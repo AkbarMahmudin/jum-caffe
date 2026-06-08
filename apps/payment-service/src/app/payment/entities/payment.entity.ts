@@ -10,6 +10,9 @@ export class Payment extends BaseEntity {
   @Column()
   orderId!: string;
 
+  @Column()
+  userId!: string;
+
   @Column({ default: 1 })
   attempt!: number;
 

@@ -10,7 +10,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrderItem } from '../entities/order-item.entity';
 import { OrderItemCustomization } from '../entities/order-item-customization.entity';
-import { OrderStatus } from '../enum/order-status.enum';
+import { OrderStatus } from '../../common/enum/order-status.enum';
 import { OrderStatusHistory } from '../entities/order-status-history.entity';
 
 @Injectable()
@@ -27,6 +27,25 @@ export class OrderRepository extends BaseRepository<Order> {
     const repo = this.getRepo(manager);
     const order = await repo.findOneOrFail({
       where: { id },
+      relations: {
+        items: {
+          customizations: true,
+        },
+        histories: true,
+      },
+    });
+
+    return order;
+  }
+
+  async findOneWithUser(
+    id: string,
+    userId: string,
+    manager?: EntityManager,
+  ): Promise<Order> {
+    const repo = this.getRepo(manager);
+    const order = await repo.findOneOrFail({
+      where: { id, userId },
       relations: {
         items: {
           customizations: true,
