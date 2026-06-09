@@ -14,7 +14,7 @@ import { AuthLoginDto } from './dto/auth-login.dto';
 import { ApiBearerAuth, ApiNoContentResponse, ApiTags } from '@nestjs/swagger';
 import { CreateNewAccessTokenDto } from './dto/create-new-access-token.dto';
 import { AuthLogoutDto } from './dto/auth-logout.dto';
-import { IAuthUser, CurrentUser, JwtAuthGuard } from '@jum-caffe/common';
+import { IUserAuth, CurrentUser, JwtAuthGuard } from '@jum-caffe/common';
 
 @ApiTags({
   name: 'Auth',
@@ -45,7 +45,7 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@CurrentUser() user: IAuthUser) {
+  getProfile(@CurrentUser() user: IUserAuth) {
     return this.authService.profile(user.sub);
   }
 }

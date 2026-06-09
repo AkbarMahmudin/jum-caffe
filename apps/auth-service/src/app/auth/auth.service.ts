@@ -2,9 +2,10 @@ import {
   Injectable,
   UnprocessableEntityException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { UserRepository } from '../user/repositories/user.repository';
-import { comparePassword } from '@jum-caffe/common';
+import { comparePassword, IUserAuth } from '@jum-caffe/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomBytes } from 'crypto';
 import { RefreshTokenRepository } from './repositories/refresh-token.repository';
@@ -30,10 +31,11 @@ export class AuthService {
   }
 
   async login(user: User) {
-    const payload = {
+    const payload: IUserAuth = {
       sub: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
     };
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = randomBytes(32).toString('hex');
@@ -62,9 +64,16 @@ export class AuthService {
       throw new UnprocessableEntityException('Invalid refresh token');
     }
 
-    const newAccessToken = this.jwtService.sign({
-      email: tokenData.email,
-      sub: tokenData.userId,
+    const user = await this.userRepository.findByEmail(tokenData.email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const newAccessToken = this.jwtService.sign<IUserAuth>({
+      sub: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
     });
 
     return {
@@ -79,10 +88,21 @@ export class AuthService {
     });
   }
 
-  profile(userId: string) {
-    return this.userRepository.findOne(
+  async profile(userId: string) {
+    const user = await this.userRepository.findOneOrFail(
       { _id: userId },
       { lean: true, projection: '-password' },
     );
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const { _id, ...rest } = user;
+
+    return {
+      id: _id,
+      ...rest,
+    };
   }
 }

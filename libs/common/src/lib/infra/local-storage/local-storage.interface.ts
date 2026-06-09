@@ -1,7 +1,7 @@
 import { ClsStore } from 'nestjs-cls';
-import { IAuthUser } from '../../interface';
+import { IUserAuth } from '../../interface';
 
 export interface ILocalStorage extends ClsStore {
-  user: IAuthUser | null;
+  user: IUserAuth | null;
   token: string | null;
 }

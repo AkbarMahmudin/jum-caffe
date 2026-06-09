@@ -8,3 +8,4 @@ export * from './lib/guard';
 export * from './lib/decorator';
 export * from './lib/strategy';
 export * from './lib/interface';
+export * from './lib/enum';
