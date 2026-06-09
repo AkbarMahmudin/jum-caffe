@@ -12,9 +12,10 @@ import { OptionService } from './option.service';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { UpdateOptionDto } from './dto/update-option.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { Public } from '@jum-caffe/common';
+import { Public, Roles, UserRole } from '@jum-caffe/common';
 
 @Controller('options')
+@Roles(UserRole.SuperAdmin)
 @ApiBearerAuth()
 export class OptionController {
   constructor(private readonly optionService: OptionService) {}

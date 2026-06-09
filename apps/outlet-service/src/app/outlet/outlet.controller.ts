@@ -14,9 +14,10 @@ import { CreateOutletDto } from './dto/create-outlet.dto';
 import { UpdateOutletDto } from './dto/update-outlet.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
-import { Public } from '@jum-caffe/common';
+import { Public, Roles, UserRole } from '@jum-caffe/common';
 
 @Controller('')
+@Roles(UserRole.SuperAdmin)
 @ApiBearerAuth()
 export class OutletController {
   constructor(private readonly outletService: OutletService) {}

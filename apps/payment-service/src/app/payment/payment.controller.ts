@@ -48,7 +48,6 @@ export class PaymentController {
 
   @Post('retry')
   reCreate(@Body() createPaymentDto: CreatePaymentDto) {
-    // TODO: Send event to order-service if retry payment
     return this.paymentService.reCreate(createPaymentDto);
   }
 }
