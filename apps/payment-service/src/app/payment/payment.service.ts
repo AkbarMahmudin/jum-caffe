@@ -103,6 +103,7 @@ export class PaymentService {
       PaymentStatus.PAID,
       PaymentStatus.PENDING,
     ].includes(payment.status as PaymentStatus);
+
     if (invalidPaymentStatus) {
       throw new UnprocessableEntityException(
         'No available payment to retry. Only payment with status cancelled, expired, or failed can be retried.',

@@ -14,10 +14,11 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryParamsDto } from './dto/query-params.dto';
 import { AddProductOptions } from './dto/add-product-options.dto';
-import { Public } from '@jum-caffe/common';
+import { Public, Roles, UserRole } from '@jum-caffe/common';
 import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
 
 @Controller()
+@Roles(UserRole.SuperAdmin)
 @ApiBearerAuth()
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
