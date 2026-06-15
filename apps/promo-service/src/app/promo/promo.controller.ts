@@ -12,7 +12,6 @@ import { PromoService } from './promo.service';
 import { CreatePromoDto } from './dto/create-promo.dto';
 import { UpdatePromoDto } from './dto/update-promo.dto';
 import { ApplyPromoDto } from './dto/apply-promo.dto';
-import { ReservePromoDto } from './dto/reserve-promo.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { Roles, UserRole } from '@jum-caffe/common';
 
@@ -38,6 +37,11 @@ export class PromoController {
   @Roles(UserRole.SuperAdmin)
   findAll() {
     return this.promoService.findAll();
+  }
+
+  @Get('available')
+  async findAvailable() {
+    return this.promoService.findAvailable();
   }
 
   @Roles(UserRole.SuperAdmin)
@@ -73,11 +77,6 @@ export class PromoController {
         id,
       },
     };
-  }
-
-  @Get('available')
-  async findAvailable() {
-    return this.promoService.findAvailable();
   }
 
   @Post('calculate')

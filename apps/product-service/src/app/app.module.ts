@@ -5,6 +5,7 @@ import {
   JwtStrategy,
   RedisModule,
   RmqModule,
+  RolesGuard,
 } from '@jum-caffe/common';
 import { ConfigModule } from '@nestjs/config';
 import { CategoryModule } from './category/category.module';
@@ -31,6 +32,10 @@ import { OutletProductModule } from './outlet-product/outlet-product.module';
     {
       provide: 'APP_GUARD',
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: RolesGuard,
     },
   ],
 })

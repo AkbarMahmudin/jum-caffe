@@ -7,6 +7,7 @@ import {
   LocalStorageModule,
   RedisModule as CacheModule,
   RmqModule,
+  RolesGuard,
 } from '@jum-caffe/common';
 import { PromoModule } from './promo/promo.module';
 
@@ -27,6 +28,10 @@ import { PromoModule } from './promo/promo.module';
     {
       provide: 'APP_GUARD',
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: 'APP_GUARD',
+      useClass: RolesGuard,
     },
   ],
 })

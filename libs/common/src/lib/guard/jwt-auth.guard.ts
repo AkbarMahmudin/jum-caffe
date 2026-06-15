@@ -12,7 +12,7 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     super();
   }
 
-  override async canActivate(context: ExecutionContext) {
+  override canActivate(context: ExecutionContext) {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -20,38 +20,6 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) {
       return true;
     }
-
-    await super.canActivate(context);
-
-    const request = context.switchToHttp().getRequest();
-    const user = request.user as IUserAuth;
-
-    /**
-     * Using if protect your route by user role (RBAC)
-     * */
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
-      ROLES_KEY,
-      [context.getHandler(), context.getClass()],
-    );
-
-    if (requiredRoles) {
-      return requiredRoles.some((role) => user?.role === role);
-    }
-
-    return !!user;
-  }
-
-  override handleRequest<IUserAuth>(
-    err: any,
-    user: IUserAuth,
-    info: any,
-    context: ExecutionContext,
-    status?: any,
-  ): IUserAuth {
-    if (err || !user) {
-      throw err || new UnauthorizedException();
-    }
-
-    return user;
+    return super.canActivate(context);
   }
 }
