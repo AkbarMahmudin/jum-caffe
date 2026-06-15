@@ -12,7 +12,10 @@ import { CacheableMemory } from 'cacheable';
       useFactory: async (configService: ConfigService) => {
         const host = configService.get('REDIS_HOST') || 'localhost';
         const port = configService.get('REDIS_PORT') || 6379;
-        const expireIn = 30 * 24 * 60 * 60 * 1000; // Default to 30 days in milliseconds
+        const expireIn = configService.get(
+          'REDIS_TTL',
+          30 * 24 * 60 * 60 * 1000,
+        ); // Default to 30 days in milliseconds
 
         return {
           stores: [

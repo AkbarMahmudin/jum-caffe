@@ -25,19 +25,3 @@ export const generateSignatureService = (
 
   return createHmac('sha256', secret).update(payload).digest('hex');
 };
-
-const path = '/payments';
-const timestamp = Date.now().toString();
-
-const signature = generateSignatureService(
-  'POST',
-  path,
-  timestamp,
-  {
-    orderId: 'd-123',
-    amount: 10000,
-  },
-  '5cfbf8b8c3d641f59d75d9f5f7c12f51',
-);
-
-console.log({ signature, timestamp });

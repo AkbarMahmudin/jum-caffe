@@ -57,6 +57,18 @@ services:
       - postgres_payment_data:/var/lib/postgresql/data
     networks:
       - postgres_payment_network
+  postgres-promo:
+    image: postgres:16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password123
+      - POSTGRES_DB=promo_db
+    ports:
+      - 5438:5432
+    volumes:
+      - postgres_promo_data:/var/lib/postgresql/data
+    networks:
+      - postgres_promo_network
 
   # Message Broker
   rabbitmq:
@@ -88,6 +100,7 @@ volumes:
   postgres_outlet_data:
   postgres_order_data:
   postgres_payment_data:
+  postgres_promo_data:
   rabbitmq_data:
 networks:
   postgres_product_network:
@@ -97,4 +110,6 @@ networks:
   postgres_order_network:
     driver: bridge
   postgres_payment_network:
+    driver: bridge
+  postgres_promo_network:
     driver: bridge

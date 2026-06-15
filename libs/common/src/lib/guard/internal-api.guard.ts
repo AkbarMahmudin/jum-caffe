@@ -40,13 +40,6 @@ export class InternalApiGuard implements CanActivate {
       secret,
     );
 
-    console.log({
-      serviceId,
-      signature,
-      timestamp,
-      expected,
-    });
-
     if (expected !== signature) {
       throw new UnauthorizedException('Invalid signature');
     }
