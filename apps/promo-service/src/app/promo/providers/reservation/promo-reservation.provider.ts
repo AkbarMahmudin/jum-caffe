@@ -38,8 +38,6 @@ export class PromoReservation {
       },
     );
 
-    this.logger.log('Add promo reservation cache');
-
     await this.promoReservationCache.create(
       `promo:reservation:${dto.orderId}`,
       '1',
@@ -81,7 +79,7 @@ export class PromoReservation {
 
   commit(orderId: string) {
     return this.promoRepository.withTransaction(async (manager) => {
-      const usage = await manager.findOneOrFail(PromoUsage, {
+      const usage = await manager.findOne(PromoUsage, {
         where: {
           orderId,
           status: PromoUsageStatus.Reserved,
@@ -90,6 +88,8 @@ export class PromoReservation {
           mode: 'pessimistic_write',
         },
       });
+
+      if (!usage) return;
 
       const promo = await manager.findOneOrFail(Promo, {
         where: {

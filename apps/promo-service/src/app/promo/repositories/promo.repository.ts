@@ -2,15 +2,8 @@ import { BaseRepository } from '@jum-caffe/common';
 import { Injectable } from '@nestjs/common';
 import { Promo } from '../entities/promo.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  DataSource,
-  EntityManager,
-  FindManyOptions,
-  QueryDeepPartialEntity,
-  Repository,
-} from 'typeorm';
+import { DataSource, EntityManager, Repository } from 'typeorm';
 import { PromoUsage } from '../entities/promo-usage.entity';
-import { PromoUsageStatus } from '../../common/enum/promo-usage-status.enum';
 
 @Injectable()
 export class PromoRepository extends BaseRepository<Promo> {
@@ -38,13 +31,11 @@ export class PromoRepository extends BaseRepository<Promo> {
           PromoUsage,
           'usage',
           `
-          usage.promoId = promo.id
+          usage.promoId = promos.id
           AND usage.userId = :customerId
-          AND usage.status = :usedStatus
           `,
           {
             customerId,
-            usedStatus: PromoUsageStatus.Used,
           },
         )
         .where('promos.isActive = true')

@@ -7,18 +7,26 @@ import {
   Delete,
   ParseUUIDPipe,
   Put,
+  Logger,
 } from '@nestjs/common';
 import { PromoService } from './promo.service';
 import { CreatePromoDto } from './dto/create-promo.dto';
 import { UpdatePromoDto } from './dto/update-promo.dto';
 import { ApplyPromoDto } from './dto/apply-promo.dto';
 import { ApiBearerAuth } from '@nestjs/swagger';
-import { Roles, UserRole } from '@jum-caffe/common';
+import { RmqService, Roles, UserRole } from '@jum-caffe/common';
+import { Ctx, EventPattern, Payload, RmqContext } from '@nestjs/microservices';
+import { PaymentEvent } from './event/payment.event';
 
 @Controller()
 @ApiBearerAuth()
 export class PromoController {
-  constructor(private readonly promoService: PromoService) {}
+  private readonly logger = new Logger(PromoController.name);
+
+  constructor(
+    private readonly promoService: PromoService,
+    private readonly rmqService: RmqService,
+  ) {}
 
   @Post()
   @Roles(UserRole.SuperAdmin)
@@ -87,5 +95,19 @@ export class PromoController {
   @Post('reserve')
   async reserve(@Body() applyPromoDto: ApplyPromoDto) {
     return this.promoService.reserve(applyPromoDto);
+  }
+
+  @EventPattern('payment.updated')
+  async commit(
+    @Payload() { eventId, payload: payment }: PaymentEvent,
+    @Ctx() ctx: RmqContext,
+  ) {
+    this.logger.log(`Received event: payment.updated (${eventId})`);
+
+    if (payment.status === 'paid') {
+      await this.promoService.commit(payment.orderId);
+
+      this.rmqService.ack(ctx);
+    }
   }
 }

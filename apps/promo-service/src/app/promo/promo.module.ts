@@ -17,9 +17,10 @@ import {
   PromoReservationCache,
   PromoReservationExpired,
 } from './providers/reservation';
+import { RmqModule } from '@jum-caffe/common';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Promo, PromoUsage])],
+  imports: [TypeOrmModule.forFeature([Promo, PromoUsage]), RmqModule],
   controllers: [PromoController],
   providers: [
     PromoService,

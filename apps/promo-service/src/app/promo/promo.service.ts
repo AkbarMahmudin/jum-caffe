@@ -70,6 +70,10 @@ export class PromoService {
     });
   }
 
+  commit(orderId: string) {
+    return this.reservation.commit(orderId);
+  }
+
   findAvailable() {
     const customerId = this.cls.get('user.sub');
 

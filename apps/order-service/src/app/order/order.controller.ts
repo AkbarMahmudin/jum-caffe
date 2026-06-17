@@ -65,10 +65,10 @@ export class OrderController {
 
   @EventPattern('payment.updated')
   async updateStatus(
-    @Payload() { payload: payment }: PaymentEvent,
+    @Payload() { eventId, payload: payment }: PaymentEvent,
     @Ctx() ctx: RmqContext,
   ) {
-    this.logger.log(`Received event: payment.updated (${payment.orderId})`);
+    this.logger.log(`Received event: payment.updated (${eventId})`);
 
     const orderStatus =
       payment.status !== OrderStatus.PENDING
